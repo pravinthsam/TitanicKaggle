@@ -8,7 +8,7 @@ import load_data
 import numpy as np
 import pandas as pd
 
-def gender_model(tr_df, te_df):
+def gender_model(te_df):
     gender_model_df = te_df[["PassengerId", "Sex"]]
     gender_model_df.columns=['PassengerId', 'Survived']
     gender_model_df.Survived = 1 - gender_model_df.Survived
@@ -31,6 +31,12 @@ if __name__ == '__main__':
     print 'Number of females onboard is {0} of which {1:.2f}% survived'.format(num_female, 100*female_survival_ratio)
     print 'Only {0:.2f}% out of {1} passengers survived'.format(total_survival_ratio*100, len(train_df))
     
+    # check training data error
+    train_error = np.sum(gender_model(train_df).Survived == train_df.Survived)
+    print 'Training error is {0:.2f}%'.format(float(train_error*100)/len(train_df))
+    
     # gender based simple decision tree
-    gender_model_df = gender_model(train_df, test_df)
+    gender_model_df = gender_model(test_df)
     gender_model_df.to_csv('results/gender_model_results.csv', index=False)
+    
+    
