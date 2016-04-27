@@ -13,9 +13,9 @@ class random_forest_model:
     
     forest = None
     
-    def __init__(self, num_trees = 20):
+    def __init__(self, num_trees = 20, depth=5):
         print 'Initializing model...'
-        self.forest = RandomForestClassifier(n_estimators = num_trees)
+        self.forest = RandomForestClassifier(n_estimators = num_trees, max_depth=depth)
         
     def fit(self, tr_df):
         print 'Fitting the model...'
@@ -39,12 +39,14 @@ if __name__ == '__main__':
     train_df.drop('Name', 1, inplace=True)
     train_df.drop('Ticket', 1, inplace=True)
     train_df.drop('Cabin', 1, inplace=True)
+    train_df.drop('Embarked', 1, inplace=True)
     
     test_df.drop('Name', 1, inplace=True)
     test_df.drop('Ticket', 1, inplace=True)
     test_df.drop('Cabin', 1, inplace=True)
+    test_df.drop('Embarked', 1, inplace=True)
     
-    rf_model = random_forest_model()
+    rf_model = random_forest_model(20, None)
     rf_model.fit(train_df)
     
     train_results = rf_model.predict(train_df)

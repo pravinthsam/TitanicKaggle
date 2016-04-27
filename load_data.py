@@ -21,6 +21,20 @@ def extractInfoFromName(name):
     info = [re.search(',\ ([\w\ ]*)\.', n, re.M|re.I).group(1) for n in name]
     return info
 
+def extractInfoFromCabin(cabin):
+    info = [re.search('\A(\w)', c, re.M|re.I).group(1) if c==c else None for c in cabin]
+    return info
+
+
+    
+def convertToNumerical(incol1, incol2, extractFunc = lambda x:x):
+    allVals = set(extractFunc(incol1)).union(set(extractFunc(incol2)))
+    valMapping = {s[1]:s[0] for s in enumerate(allVals)}
+    return ([valMapping[s] for s in extractFunc(incol1)], [valMapping[s] for s in extractFunc(incol2)])
+    
+    
+    
+
 def load_titanic_dataset(folderpath=None):
     if folderpath is None:
         folderpath = os.getcwd()+'/data/'
@@ -33,8 +47,7 @@ def load_titanic_dataset(folderpath=None):
     test_df.Sex = test_df.Sex.map( {'female': 0, 'male': 1} ).astype(int)
     
     # Change embarked to numeric
-    train_df.Embarked = train_df.Embarked.map({s[1]:s[0] for s in enumerate(train_df.Embarked.unique())}).astype(int)
-    test_df.Embarked = test_df.Embarked.map({s[1]:s[0] for s in enumerate(test_df.Embarked.unique())}).astype(int)
+    train_df['Embarked2'], test_df['Embarked2'] = convertToNumerical(train_df.Embarked, test_df.Embarked)
     
     # Fill unavailable age values
     meanAge, train_df.Age = fillWithAverage(train_df.Age)
@@ -45,10 +58,10 @@ def load_titanic_dataset(folderpath=None):
     _, test_df.Fare = fillWithAverage(test_df.Fare, meanFare)
     
     # Extract honorary from name
-    allHonorary = set(extractInfoFromName(train_df.Name)).union(set(extractInfoFromName(test_df.Name)))
-    honoraryMapping = {s[1]:s[0] for s in enumerate(allHonorary)}
-    train_df['Honorary'] = [honoraryMapping[s] for s in extractInfoFromName(train_df.Name)]
-    test_df['Honorary'] = [honoraryMapping[s] for s in extractInfoFromName(test_df.Name)]
+    train_df['Honorary'], test_df['Honorary'] = convertToNumerical(train_df.Name, test_df.Name, extractInfoFromName)
+    
+    #Extract cabin info
+    train_df['Cabin2'], test_df['Cabin2'] = convertToNumerical(train_df.Cabin, test_df.Cabin, extractInfoFromCabin)
     
     return (train_df, test_df)
     
