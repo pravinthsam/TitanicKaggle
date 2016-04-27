@@ -50,10 +50,8 @@ if __name__ == '__main__':
     train_results = rf_model.predict(train_df)
     test_results = rf_model.predict(test_df)
     
-    '''
     # check training data error
-    train_error = np.sum(rf_model.predict(train_df).Survived == train_df.Survived)
+    train_error = np.sum(train_results.Survived == train_df.Survived)
     print 'Training error is {0:.2f}%'.format(float(train_error*100)/len(train_df))
     
-    rf_model.predict(test_df).to_csv('results/random_forest_results.csv')
-    '''
+    rf_model.predict(test_df).to_csv('results/random_forest_results.csv', index=False)
